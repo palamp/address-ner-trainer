@@ -1,0 +1,6 @@
+[core]
+    remote = ai-artifact-remote
+['remote "ai-artifact-remote"']
+    url = gs://deeple-dvc/address-ner
+    projectname = deeple-core
+    credentialpath = dvc-gs-service-account.json

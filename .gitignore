@@ -1,0 +1,12 @@
+**/__pycache__/**
+.DS_Store
+*.ipynb_checkpoints
+
+*.png
+*.csv
+/dataset
+/raw
+/saved_model
+loss_*.txt
+*.json
+/thai2fit

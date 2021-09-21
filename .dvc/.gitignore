@@ -1,0 +1,10 @@
+/config.local
+/updater
+/lock
+/updater.lock
+/tmp
+/state-journal
+/state-wal
+/state
+/cache
+/dvc-gs-service-account.json

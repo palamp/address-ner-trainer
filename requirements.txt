@@ -1,0 +1,12 @@
+tensorflow==2.1.0
+pythainlp==2.1.4
+nltk==3.5
+tqdm==4.49.0
+dill==0.3.1.1
+scikit-learn==0.22
+gensim==3.8.1
+tensorflow-addons==0.8.2
+h5py==2.10.0
+jupyter==1.0.0
+numpy==1.19.5
+git+ssh://git@github.com/deeple-ai/deeple_preprocessor.git@c1bdae26c6f831f132f1de519d93bfa5e182f200
