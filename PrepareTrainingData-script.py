@@ -18,7 +18,7 @@ def alldata_list(lists):
     for data in tqdm(lists):
         data_num = []
         try:
-            txt = text2conll2002(data).split("\n")
+            txt = text2conll2002(data, pos=False).split("\n")
             for d in txt:
                 tt = d.split("\t")
                 if d != "":
