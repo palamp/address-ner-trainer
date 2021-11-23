@@ -1,13 +1,8 @@
 import re
 
 from deeple_preprocessor.tokenize import newmm_tokenize
-from nltk.tokenize import RegexpTokenizer
 from pythainlp.tag import pos_tag
 
-# เตรียมตัวตัด tag ด้วย re
-pattern = r"\[(.*?)\](.*?)\[\/(.*?)\]"
-# ใช้ nltk.tokenize.RegexpTokenizer เพื่อตัด [TIME]8.00[/TIME] ให้เป็น ('TIME','ไง','TIME')
-tokenizer = RegexpTokenizer(pattern)
 re_tag = re.compile("(\[.*?\])")
 
 
@@ -27,28 +22,18 @@ def postag(text):
 
 
 # จัดการกับ tag ที่ไม่ได้ tag
-def toolner_to_tag(text):
-    text = (
-        text.strip()
-        .replace("FACILITY", "LOCATION")
-        .replace("[AGO]", "")
-        .replace("[/AGO]", "")
-        .replace("[T]", "")
-        .replace("[/T]", "")
-    )
-    text = re.sub("<[^>]*>", "", text)
-    text = re.sub(
-        "(\[\/(.*?)\])", "\\1***", text
-    )  # .replace('(\[(.*?)\])','***\\1')# text.replace('>','>***') # ตัดการกับพวกไม่มี tag word
-    text = re.sub("(\[\w+\])", "***\\1", text)
-    text2 = []
-    for i in text.split("***"):
-        if "[" in i:
-            text2.append(i)
+def toolner_to_tag(text_list):
+    text_list = list(filter(None, re_tag.split(text_list)))
+    i = 0
+    results = []
+    while i < len(text_list):
+        if "[" not in text_list[i]:
+            results.append(("word", text_list[i], "word"))
+            i += 1
         else:
-            text2.append("[word]" + i + "[/word]")
-    text = "".join(text2)  # re.sub("[word][/word]","","".join(text2))
-    return text.replace()
+            results.append((text_list[i][1:-1], text_list[i + 1], text_list[i + 2][2:-1]))
+            i += 3
+    return results
 
 
 # แปลง text ให้เป็น conll2002
@@ -56,32 +41,21 @@ def text2conll2002(text, pos=True):
     """
     ใช้แปลงข้อความให้กลายเป็น conll2002
     """
-    text = toolner_to_tag(text)
-    text = text.replace("''", '"')
-    text = text.replace("’", '"').replace("‘", '"')  # .replace('"',"")
-    tag = tokenizer.tokenize(text)
-    j = 0
+    tag = toolner_to_tag(text)
     conll2002 = ""
     for tagopen, text, tagclose in tag:
         word_cut = newmm_tokenize(text)  # ใช้ตัวตัดคำ newmm
-        i = 0
-        txt5 = ""
-        while i < len(word_cut):
-            if word_cut[i] == "''" or word_cut[i] == '"':
-                pass
-            elif i == 0 and tagopen != "word":
-                txt5 += word_cut[i]
-                txt5 += "\t" + "B-" + tagopen
-            elif tagopen != "word":
-                txt5 += word_cut[i]
-                txt5 += "\t" + "I-" + tagopen
+        tmp = ""
+        for i, tokenized_text in enumerate(word_cut):
+            if tokenized_text == "''" or tokenized_text == '"':
+                continue
+            elif tagopen != "word" and i:
+                tmp += f"{tokenized_text}\tI-{tagopen}\n"
+            elif tagopen != "word" and not i:
+                tmp += f"{tokenized_text}\tB-{tagopen}\n"
             else:
-                txt5 += word_cut[i]
-                txt5 += "\t" + "O"
-            txt5 += "\n"
-            # j+=1
-            i += 1
-        conll2002 += txt5
-    if pos == False:
+                tmp += f"{tokenized_text}\tO\n"
+        conll2002 += tmp
+    if not pos:
         return conll2002
     return postag(conll2002)
