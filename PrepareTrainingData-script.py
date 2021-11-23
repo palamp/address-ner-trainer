@@ -16,17 +16,9 @@ from services.tokenize import text2conll2002
 def alldata_list(lists):
     data_all = []
     for data in tqdm(lists):
-        data_num = []
         try:
-            txt = text2conll2002(data, pos=False).split("\n")
-            for d in txt:
-                tt = d.split("\t")
-                if d != "":
-                    if len(tt) == 3:
-                        data_num.append((tt[0], tt[1], tt[2]))
-                    else:
-                        data_num.append((tt[0], tt[1]))
-            data_all.append(data_num)
+            txt = text2conll2002(data, pos=True)
+            data_all += list(map(tuple, txt))
         except:
             print(data)
     return data_all
