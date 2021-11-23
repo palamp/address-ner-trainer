@@ -12,6 +12,7 @@ def replace_and_remove_tags(text):
         .replace("[/AGO]", "")
         .replace("[T]", "")
         .replace("[/T]", "")
+        .replace("[ไม่ยืนยัน]", "")
     )
     text = re.sub("<[^>]*>", "", text)
     return text
