@@ -3,6 +3,14 @@ from typing import Dict
 
 emoji_pattern = re.compile(r"[\u0E00-\u0E7Fa-zA-Z0-9' \n\-!$%^&*()_+|~=`{}\[\]:'<>?,.#\/]")
 
+prefixs = ["นาย", "นาง", "น.ส.", "นางสาว", "น.พ.", "นพ.", "พ.ต.ท.", "ด.ช.", "ด.ญ.", "เด็กชาย", "เด็กหญิง"]
+
+
+def remove_prefix(text):
+    for i in prefixs:
+        text = text.replace(i, "")
+    return text
+
 
 def replace_and_remove_tags(text):
     text = (

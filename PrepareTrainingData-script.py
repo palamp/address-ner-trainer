@@ -7,7 +7,9 @@ from services.data_cleaning import (
     is_unique,
     normalize_quote,
     normalize_space,
+    prefixs,
     remove_emojis,
+    remove_prefix,
     replace_and_remove_tags,
 )
 from services.tokenize import text2conll2002
@@ -19,6 +21,10 @@ def alldata_list(lists):
         try:
             txt = text2conll2002(data, pos=False)
             data_all.append(list(map(tuple, txt)))
+            if any([prefix in data for prefix in prefixs]):
+                data = remove_prefix(data)
+                txt = text2conll2002(data, pos=False)
+                data_all.append(list(map(tuple, txt)))
         except:
             print(data)
     return data_all
