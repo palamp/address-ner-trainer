@@ -17,8 +17,8 @@ def alldata_list(lists):
     data_all = []
     for data in tqdm(lists):
         try:
-            txt = text2conll2002(data, pos=True)
-            data_all += list(map(tuple, txt))
+            txt = text2conll2002(data, pos=False)
+            data_all.append(list(map(tuple, txt)))
         except:
             print(data)
     return data_all
