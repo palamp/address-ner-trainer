@@ -1,6 +1,6 @@
 import numpy as np
 from tensorflow.keras import Model
-from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.layers import (
     LSTM,
     Bidirectional,
@@ -115,10 +115,15 @@ def fit_model(
     train_batch_size=32,
     max_len=284,
     max_len_char=30,
+    is_early_stop=False,
 ):
     filepath = "saved_model/weights-improvement-{epoch:02d}-{accuracy:.3f}.hdf5"
+
     checkpoint = ModelCheckpoint(filepath, monitor="val_accuracy", verbose=1, save_best_only=True, mode="max")
+    early_stopper = EarlyStopping(patience=5, restore_best_weights=True)
     callbacks_list = [checkpoint]
+    if is_early_stop:
+        callbacks_list.append(early_stopper)
 
     history = model.fit(
         [X_word_tr, np.array(X_char_tr).reshape((len(X_char_tr), max_len, max_len_char))],
