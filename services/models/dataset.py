@@ -44,14 +44,10 @@ def encode_character_input(sentences, max_len_word, max_len_char):
     return x_char
 
 
-def get_dataset(max_len) -> Dict[str, np.ndarray]:
+def get_dataset(filepath) -> Dict[str, np.ndarray]:
     """
-    Args:
-        max_len(int): word padding
     Returns:
-        A dictionary contains
-            key: String
-            value: Numpy array with shape `(len(sequences), maxlen)`
+        A dictionary length = 4, [x_word, x_target, y_word, y_target]
     """
 
     def sentences_to_word(sentences_dataset) -> Tuple[List, List]:
@@ -63,15 +59,35 @@ def get_dataset(max_len) -> Dict[str, np.ndarray]:
                 target.append(word_tup[1])
         return word, target
 
-    with open("dataset/ner.data", "rb") as file:
+    with open(filepath, "rb") as file:
         datatofile = dill.load(file)
     train_sents, test_sents = train_test_split(datatofile, test_size=0.1, random_state=112)
 
     train_word, train_target = sentences_to_word(train_sents)
     test_word, test_target = sentences_to_word(test_sents)
 
+    return {
+        "x_word": train_word,
+        "x_target": train_target,
+        "y_word": test_word,
+        "y_target": test_target,
+    }
+
+
+def padding_dataset(dataset: Dict[str, np.ndarray], max_len) -> Dict[str, np.ndarray]:
+    """
+    Args:
+        dataset(dict):
+            A dictionary length = 4, contains: x_word, x_target, y_word, y_target
+        max_len(int): word padding
+    Returns:
+        A dictionary length = 4, [x_word, x_target, y_word, y_target]
+            key: String
+            value: Numpy array with shape `(len(sequences), maxlen)`
+    """
+
     thai2dict_word_index = {word: index for index, word in enumerate(thai2fit_model.index2word)}
-    ner_label_index = {label: index for index, label in enumerate(sorted(set(train_target + ["pad"])))}
+    ner_label_index = {label: index for index, label in enumerate(sorted(set(dataset["x_target"] + ["pad"])))}
 
     def prepare_sequence_word(input_text):
         idxs = list()
@@ -86,7 +102,7 @@ def get_dataset(max_len) -> Dict[str, np.ndarray]:
         idxs = [ner_label_index[w] for w in input_label]
         return idxs
 
-    def prepare_sequence(data: List, func: Callable, pad_idx):
+    def padding_sequence(data: List, func: Callable, pad_idx):
         result = pad_sequences(
             sequences=[func(s) for s in data],
             value=pad_idx,
@@ -96,14 +112,14 @@ def get_dataset(max_len) -> Dict[str, np.ndarray]:
         )
         return result
 
-    train_word = prepare_sequence(train_word, prepare_sequence_word, thai2dict_word_index["pad"])
-    train_target = prepare_sequence(train_target, prepare_sequence_target, ner_label_index["pad"])
-    test_word = prepare_sequence(test_word, prepare_sequence_word, thai2dict_word_index["pad"])
-    test_target = prepare_sequence(test_target, prepare_sequence_target, ner_label_index["pad"])
+    x_word = padding_sequence(dataset["x_word"], prepare_sequence_word, thai2dict_word_index["pad"])
+    x_target = padding_sequence(dataset["x_target"], prepare_sequence_target, ner_label_index["pad"])
+    y_word = padding_sequence(dataset["y_word"], prepare_sequence_word, thai2dict_word_index["pad"])
+    y_target = padding_sequence(dataset["y_target"], prepare_sequence_target, ner_label_index["pad"])
 
     return {
-        "x_word": train_word,
-        "x_target": train_target,
-        "y_word": test_word,
-        "y_target": test_target,
+        "x_word": x_word,
+        "x_target": x_target,
+        "y_word": y_word,
+        "y_target": y_target,
     }
