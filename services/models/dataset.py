@@ -47,7 +47,7 @@ def encode_character_input(sentences, max_len_word, max_len_char):
 def get_dataset(filepath) -> Dict[str, np.ndarray]:
     """
     Returns:
-        A dictionary length = 4, [x_word, x_target, y_word, y_target]
+        A dictionary length = 4, [train_word, train_target, test_word, test_target]
     """
 
     def sentences_to_word(sentences_dataset) -> Tuple[List, List]:
@@ -67,10 +67,10 @@ def get_dataset(filepath) -> Dict[str, np.ndarray]:
     test_word, test_target = sentences_to_word(test_sents)
 
     return {
-        "x_word": train_word,
-        "x_target": train_target,
-        "y_word": test_word,
-        "y_target": test_target,
+        "train_word": train_word,
+        "train_target": train_target,
+        "test_word": test_word,
+        "test_target": test_target,
     }
 
 
@@ -78,16 +78,18 @@ def padding_dataset(dataset: Dict[str, np.ndarray], max_len) -> Dict[str, np.nda
     """
     Args:
         dataset(dict):
-            A dictionary length = 4, contains: x_word, x_target, y_word, y_target
+            A dictionary length = 4, contains: train_word, train_target, test_word, test_target
         max_len(int): word padding
     Returns:
-        A dictionary length = 4, [x_word, x_target, y_word, y_target]
+        A dictionary length = 4, [train_word, train_target, test_word, test_target]
             key: String
             value: Numpy array with shape `(len(sequences), maxlen)`
     """
 
     thai2dict_word_index = {word: index for index, word in enumerate(thai2fit_model.index2word)}
-    ner_label_index = {label: index for index, label in enumerate(sorted(set(dataset["x_target"] + ["pad"])))}
+    ner_label_index = {
+        label: index for index, label in enumerate(sorted(set(dataset["train_target"] + ["pad"])))
+    }
 
     def prepare_sequence_word(input_text):
         idxs = list()
@@ -112,14 +114,14 @@ def padding_dataset(dataset: Dict[str, np.ndarray], max_len) -> Dict[str, np.nda
         )
         return result
 
-    x_word = padding_sequence(dataset["x_word"], prepare_sequence_word, thai2dict_word_index["pad"])
-    x_target = padding_sequence(dataset["x_target"], prepare_sequence_target, ner_label_index["pad"])
-    y_word = padding_sequence(dataset["y_word"], prepare_sequence_word, thai2dict_word_index["pad"])
-    y_target = padding_sequence(dataset["y_target"], prepare_sequence_target, ner_label_index["pad"])
+    train_word = padding_sequence(dataset["train_word"], prepare_sequence_word, thai2dict_word_index["pad"])
+    train_target = padding_sequence(dataset["train_target"], prepare_sequence_target, ner_label_index["pad"])
+    test_word = padding_sequence(dataset["test_word"], prepare_sequence_word, thai2dict_word_index["pad"])
+    test_target = padding_sequence(dataset["test_target"], prepare_sequence_target, ner_label_index["pad"])
 
     return {
-        "x_word": x_word,
-        "x_target": x_target,
-        "y_word": y_word,
-        "y_target": y_target,
+        "train_word": train_word,
+        "train_target": train_target,
+        "test_word": test_word,
+        "test_target": test_target,
     }
