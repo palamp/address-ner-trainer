@@ -51,13 +51,17 @@ def get_dataset(filepath) -> Dict[str, np.ndarray]:
     """
 
     def sentences_to_word(sentences_dataset) -> Tuple[List, List]:
-        word = []
-        target = []
+        word_sent = []
+        target_sent = []
         for sentences in sentences_dataset:
+            word = []
+            target = []
             for word_tup in sentences:
                 word.append(word_tup[0])
                 target.append(word_tup[1])
-        return word, target
+            word_sent.append(word)
+            target_sent.append(target)
+        return word_sent, target_sent
 
     with open(filepath, "rb") as file:
         datatofile = dill.load(file)
