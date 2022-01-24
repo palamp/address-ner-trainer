@@ -1,6 +1,5 @@
-from ..services.models import thai2fit_model
-from ..services.models.dataset import char_to_index, encode_character_input, get_dataset, padding_dataset
-from ..services.models.model import create_models, fit_model
+from ..services.dataset import char_to_index, encode_character_input, get_dataset, padding_dataset
+from ..services.model import create_models, fit_model, thai2fit_model
 
 
 def train_model_controller(is_padding=False):

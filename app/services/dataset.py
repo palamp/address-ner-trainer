@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tqdm import tqdm
 
-from . import thai2fit_model
+from .model import thai2fit_model
 
 
 @lru_cache
