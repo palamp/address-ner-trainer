@@ -155,14 +155,14 @@ def fit_model(
         callbacks_list.append(early_stopper)
 
     history = model.fit(
-        [X_word_tr, np.array(X_char_tr).reshape((len(X_char_tr), max_len, max_len_char))],
+        [X_word_tr, np.array(X_char_tr).reshape(-1, max_len, max_len_char)],
         y_tr,
         batch_size=train_batch_size,
         epochs=1,
         verbose=1,
         callbacks=callbacks_list,
         validation_data=(
-            [X_word_te, np.array(X_char_te).reshape((len(X_char_te), max_len, max_len_char))],
+            [X_word_te, np.array(X_char_te).reshape(-1, max_len, max_len_char)],
             y_te,
         ),
         shuffle=True,
