@@ -78,7 +78,9 @@ def get_dataset(filepath) -> Dict[str, np.ndarray]:
     }
 
 
-def padding_dataset(dataset: Dict[str, np.ndarray], max_len) -> Dict[str, np.ndarray]:
+def padding_dataset(
+    dataset: Dict[str, np.ndarray], max_len: int, ner_label_index: Dict[str, int]
+) -> Dict[str, np.ndarray]:
     """
     Args:
         dataset(dict):
@@ -91,9 +93,6 @@ def padding_dataset(dataset: Dict[str, np.ndarray], max_len) -> Dict[str, np.nda
     """
 
     thai2dict_word_index = {word: index for index, word in enumerate(thai2fit_model.index2word)}
-    ner_label_index = {
-        label: index for index, label in enumerate(sorted(set(dataset["train_target"] + ["pad"])))
-    }
 
     def prepare_sequence_word(input_text):
         idxs = list()
