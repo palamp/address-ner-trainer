@@ -4,7 +4,7 @@ from ..services.dataset import char_to_index, encode_character_input, get_datase
 from ..services.model import create_models, fit_model, thai2fit_model
 
 
-def train_model_controller(is_padding=False, debug=False):
+def train_model_controller(is_padding=False, debug=False, early_stop=False):
     n_word = len(thai2fit_model.index2word)
     n_char = len(char_to_index())
     max_len_word = 284
@@ -30,6 +30,7 @@ def train_model_controller(is_padding=False, debug=False):
         dataset["test_word"],
         y_char_dataset,
         dataset["test_target"],
+        is_early_stop=early_stop,
     )
 
     save_filepath = "saved_model/last_weight-50.hdf5"
