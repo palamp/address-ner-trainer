@@ -66,6 +66,7 @@ def create_models(
     max_len_char=30,
     main_lstm_unit=256,  # Bidirectional 256 + 256 = 512
     lstm_recurrent_dropout=0.5,
+    debug=False,
 ):
     # Word Input and Word Embedding Using Thai2Fit
     word_in = Input(shape=(max_len_word,), name="word_input")
@@ -96,7 +97,7 @@ def create_models(
     base_model = Model(inputs=[word_in, char_in], outputs=main_lstm)
 
     model = CRFModelWrapper(base_model, crf_unit)
-    model.compile(optimizer="adam", metrics=[Accuracy()], run_eagerly=False)
+    model.compile(optimizer="adam", metrics=[Accuracy()], run_eagerly=debug)
     return model
 
 

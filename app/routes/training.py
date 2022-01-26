@@ -10,5 +10,6 @@ def training_group():
 
 @training_group.command()
 @click.option("--padding", is_flag=True)
-def train(padding):
-    train_model_controller(is_padding=padding)
+@click.option("--debug", is_flag=True)
+def train(padding, debug):
+    train_model_controller(is_padding=padding, debug=debug)
