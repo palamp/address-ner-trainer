@@ -1,5 +1,6 @@
+from pathlib import Path
+
 import numpy as np
-import tensorflow as tf
 from gensim.models import KeyedVectors
 from tensorflow.keras import Model
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
@@ -15,39 +16,9 @@ from tensorflow.keras.layers import (
     concatenate,
 )
 from tensorflow.keras.metrics import Accuracy
-from tensorflow_addons.layers.crf import CRF
-from tensorflow_addons.text.crf import crf_log_likelihood
+from tensorflow_addons.text.crf_wrapper import CRFModelWrapper
 
 thai2fit_model: KeyedVectors = KeyedVectors.load_word2vec_format("thai2fit/thai2vecNoSym.bin", binary=True)
-
-
-class ConditionalRandomFieldLoss(object):
-    def __init__(self, name: str = "crf_loss"):
-        self.name = name
-
-    def get_config(self):
-        return {"name": self.name}
-
-    def __call__(self, y_true, y_pred, sample_weight=None):
-        crf_layer = y_pred._keras_history[0]
-
-        # check if last layer is CRF
-        if not isinstance(crf_layer, CRF):
-            raise ValueError("Last layer must be CRF for use {}.".format(self.__class__.__name__))
-        _, potentials, sequence_length, chain_kernel = y_pred
-        loss_vector = self.compute_crf_loss(potentials, sequence_length, chain_kernel, y_pred, sample_weight)
-
-        return loss_vector
-
-    def compute_crf_loss(self, potentials, sequence_length, kernel, y, sample_weight=None):
-        crf_likelihood, _ = crf_log_likelihood(potentials, y, sequence_length, kernel)
-        # convert likelihood to loss
-        flat_crf_loss = -1 * crf_likelihood
-        if sample_weight is not None:
-            flat_crf_loss = flat_crf_loss * sample_weight
-        crf_loss = tf.reduce_mean(flat_crf_loss)
-
-        return crf_loss
 
 
 class CharacterEmbeddingBlock(Layer):
@@ -121,15 +92,11 @@ def create_models(
     )(all_word_embeddings)
     main_lstm = TimeDistributed(Dense(50, activation="relu"))(main_lstm)
 
-    # CRF
-    out = CRF(crf_unit)(main_lstm)
-
     # Model
-    model = Model(inputs=[word_in, char_in], outputs=out)
+    base_model = Model(inputs=[word_in, char_in], outputs=main_lstm)
 
-    model.compile(optimizer="adam", loss=ConditionalRandomFieldLoss(), metrics=[Accuracy()])
-
-    model.summary()
+    model = CRFModelWrapper(base_model, crf_unit)
+    model.compile(optimizer="adam", metrics=[Accuracy()], run_eagerly=False)
     return model
 
 
@@ -147,8 +114,10 @@ def fit_model(
     is_early_stop=False,
 ):
     filepath = "saved_model/weights-improvement-{epoch:02d}-{accuracy:.3f}.hdf5"
-
-    checkpoint = ModelCheckpoint(filepath, monitor="val_accuracy", verbose=1, save_best_only=True, mode="max")
+    Path(filepath).parent.mkdir(parents=True, exist_ok=True)
+    checkpoint = ModelCheckpoint(
+        filepath, monitor="val_accuracy", verbose=1, save_best_only=True, mode="max", save_weights_only=True
+    )
     early_stopper = EarlyStopping(patience=5, restore_best_weights=True)
     callbacks_list = [checkpoint]
     if is_early_stop:
