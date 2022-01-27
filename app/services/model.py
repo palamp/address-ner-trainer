@@ -119,7 +119,9 @@ def fit_model(
     checkpoint = ModelCheckpoint(
         filepath, monitor="val_accuracy", verbose=1, save_best_only=True, mode="max", save_weights_only=True
     )
-    early_stopper = EarlyStopping(patience=5, restore_best_weights=True)
+    early_stopper = EarlyStopping(
+        monitor="val_accuracy", min_delta=1e-3, patience=5, restore_best_weights=True, verbose=1
+    )
     tensorboard = TensorBoard(histogram_freq=1, write_steps_per_second=True, update_freq=8, embeddings_freq=1)
     callbacks_list = [checkpoint, tensorboard]
     if is_early_stop:
@@ -132,7 +134,7 @@ def fit_model(
         epochs=100,
         verbose=1,
         callbacks=callbacks_list,
-        validation_data=([X_word_te, np.array(X_char_te).reshape(-1, max_len, max_len_char)], y_te,),
+        validation_data=([X_word_te, np.array(X_char_te).reshape(-1, max_len, max_len_char)], y_te),
         shuffle=True,
     )
 
