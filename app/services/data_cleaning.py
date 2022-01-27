@@ -16,11 +16,19 @@ def replace_and_remove_tags(text):
     text = (
         text.strip()
         .replace("FACILITY", "LOCATION")
-        .replace("[AGO]", "")
-        .replace("[/AGO]", "")
+        .replace("ADDR]", "ADDRESS]")
+        .replace("SUBD", "LOCATION")
+        .replace("DIST", "LOCATION")
+        .replace("PROV", "LOCATION")
+        .replace("EMAL", "EMAIL")
+        .replace("PERS]", "PERSON]")
+        .replace("PHON]", "PHONE]")
+        .replace("ZIP]", "POSTAL]")
+        .replace("POST]", "POSTAL]")
+        .replace("AGO", "TIME")
+        # NOTE: [T] is tempareture, on data_ner.txt had too few label to training
         .replace("[T]", "")
         .replace("[/T]", "")
-        .replace("[ไม่ยืนยัน]", "")
     )
     text = re.sub("<[^>]*>", "", text)
     return text
