@@ -33,5 +33,5 @@ def train_model_controller(is_padding=False, debug=False, early_stop=False):
         is_early_stop=early_stop,
     )
 
-    save_filepath = "saved_model/last_weight-50.hdf5"
-    model.save_weights(save_filepath)
+    save_filepath = "saved_model/last_weight"
+    model.save(save_filepath)
