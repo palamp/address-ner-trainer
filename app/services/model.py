@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -114,15 +115,28 @@ def fit_model(
     max_len_char=30,
     is_early_stop=False,
 ):
-    filepath = "saved_model/weights-improvement-{epoch:02d}-{accuracy:.3f}.ckpt"
-    Path(filepath).parent.mkdir(parents=True, exist_ok=True)
+    str_time = datetime.now().strftime("%Y%m%d-%H%M%S")
+    checkpoint_path = "saved_model/" + str_time + "/weights-improvement-{epoch:02d}-{accuracy:.3f}.ckpt"
+    tensorboard_logpath = "logs/" + str_time
+    Path(checkpoint_path).parent.mkdir(parents=True, exist_ok=True)
     checkpoint = ModelCheckpoint(
-        filepath, monitor="val_accuracy", verbose=1, save_best_only=True, mode="max", save_weights_only=True
+        checkpoint_path,
+        monitor="val_accuracy",
+        verbose=1,
+        save_best_only=True,
+        mode="max",
+        save_weights_only=True,
     )
     early_stopper = EarlyStopping(
         monitor="val_accuracy", min_delta=1e-3, patience=5, restore_best_weights=True, verbose=1
     )
-    tensorboard = TensorBoard(histogram_freq=1, write_steps_per_second=True, update_freq=8, embeddings_freq=1)
+    tensorboard = TensorBoard(
+        log_dir=tensorboard_logpath,
+        histogram_freq=1,
+        write_steps_per_second=True,
+        update_freq=8,
+        embeddings_freq=1,
+    )
     callbacks_list = [checkpoint, tensorboard]
     if is_early_stop:
         callbacks_list.append(early_stopper)
@@ -131,7 +145,7 @@ def fit_model(
         [X_word_tr, np.array(X_char_tr).reshape(-1, max_len, max_len_char)],
         y_tr,
         batch_size=train_batch_size,
-        epochs=100,
+        epochs=10,
         verbose=1,
         callbacks=callbacks_list,
         validation_data=([X_word_te, np.array(X_char_te).reshape(-1, max_len, max_len_char)], y_te),
