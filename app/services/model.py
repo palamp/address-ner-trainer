@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 from gensim.models import KeyedVectors
 from tensorflow.keras import Model
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 from tensorflow.keras.layers import (
     LSTM,
     Bidirectional,
@@ -114,13 +114,14 @@ def fit_model(
     max_len_char=30,
     is_early_stop=False,
 ):
-    filepath = "saved_model/weights-improvement-{epoch:02d}-{accuracy:.3f}.hdf5"
+    filepath = "saved_model/weights-improvement-{epoch:02d}-{accuracy:.3f}.ckpt"
     Path(filepath).parent.mkdir(parents=True, exist_ok=True)
     checkpoint = ModelCheckpoint(
         filepath, monitor="val_accuracy", verbose=1, save_best_only=True, mode="max", save_weights_only=True
     )
     early_stopper = EarlyStopping(patience=5, restore_best_weights=True)
-    callbacks_list = [checkpoint]
+    tensorboard = TensorBoard(histogram_freq=1, write_steps_per_second=True, update_freq=8, embeddings_freq=1)
+    callbacks_list = [checkpoint, tensorboard]
     if is_early_stop:
         callbacks_list.append(early_stopper)
 
@@ -128,13 +129,10 @@ def fit_model(
         [X_word_tr, np.array(X_char_tr).reshape(-1, max_len, max_len_char)],
         y_tr,
         batch_size=train_batch_size,
-        epochs=1,
+        epochs=100,
         verbose=1,
         callbacks=callbacks_list,
-        validation_data=(
-            [X_word_te, np.array(X_char_te).reshape(-1, max_len, max_len_char)],
-            y_te,
-        ),
+        validation_data=([X_word_te, np.array(X_char_te).reshape(-1, max_len, max_len_char)], y_te,),
         shuffle=True,
     )
 
