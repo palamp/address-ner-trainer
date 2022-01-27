@@ -5,7 +5,7 @@ tqdm==4.49.0
 dill==0.3.4
 scikit-learn==0.24.2
 gensim==3.8.3
-tensorflow-addons==0.8.2
+tensorflow-addons==0.15.0
 h5py==3.1.0
 numpy==1.19.5
 git+ssh://git@github.com/deeple-ai/deeple_preprocessor.git@8e649e04d9b72a589edc5049e2f5b8fafe4746a0#egg=deeple_preprocessor
