@@ -1,9 +1,10 @@
 import codecs
+from pathlib import Path
 
 import dill
 from tqdm import tqdm
 
-from services.data_cleaning import (
+from app.services.data_cleaning import (
     is_unique,
     normalize_quote,
     normalize_space,
@@ -12,7 +13,7 @@ from services.data_cleaning import (
     remove_prefix,
     replace_and_remove_tags,
 )
-from services.tokenize import text2conll2002
+from app.services.tokenize import text2conll2002
 
 
 def alldata_list(lists):
@@ -52,7 +53,9 @@ def read_text(fileopen):
 
 
 if __name__ == "__main__":
-    text_lines = read_text("dataset/generated_ner.txt")
-    datatofile = alldata_list(text_lines)
+    datatofile = []
+    for file in Path("dataset").glob("*_train.txt"):
+        text_lines = read_text(file)
+        datatofile += alldata_list(text_lines)
     with open("dataset/ner.data", "wb") as dill_file:
         dill.dump(datatofile, dill_file)
