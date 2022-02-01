@@ -22,7 +22,14 @@ def train_model_controller(debug=False, early_stop=False):
     }
     dataset = padding_dataset(dataset, max_len_word, ner_label_index)
 
-    model = create_models(n_word, n_char, len(ner_label_index), max_len_word=max_len_word, debug=debug)
+    model = create_models(
+        n_word,
+        n_char,
+        len(ner_label_index),
+        max_len_word=max_len_word,
+        max_len_char=max_len_char,
+        debug=debug,
+    )
     history, model = fit_model(
         model,
         dataset["train_word"],
