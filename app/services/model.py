@@ -47,7 +47,7 @@ class CharacterEmbeddingBlock(Layer):
                 input_dim=n_chars,
                 output_dim=character_embedding_dim,
                 input_length=max_len_char,
-                mask_zero=False,
+                mask_zero=True,
             )
         )
 
@@ -74,20 +74,23 @@ def create_models(
     n_thai2dict,
     n_chars,
     crf_unit,
-    max_len_word=284,
-    max_len_char=30,
+    max_len_word,
+    max_len_char,
     main_lstm_unit=256,  # Bidirectional 256 + 256 = 512
     lstm_recurrent_dropout=0.5,
     debug=False,
 ):
+    # add weight for padding
+    weights = np.insert(thai2fit_model.vectors, 0, np.zeros(400), axis=0)
+
     # Word Input and Word Embedding Using Thai2Fit
     word_in = Input(shape=(max_len_word,), name="word_input")
     word_embeddings = Embedding(
         input_dim=n_thai2dict,
         output_dim=400,
-        weights=[thai2fit_model.vectors],
+        weights=[weights],
         input_length=max_len_word,
-        mask_zero=False,
+        mask_zero=True,
         name="word_embedding",
         trainable=False,
     )(word_in)
