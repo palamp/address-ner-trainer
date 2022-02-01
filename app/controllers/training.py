@@ -4,7 +4,7 @@ from ..services.dataset import char_to_index, encode_character_input, get_datase
 from ..services.model import create_models, fit_model, thai2fit_model
 
 
-def train_model_controller(is_padding=False, debug=False, early_stop=False):
+def train_model_controller(debug=False, early_stop=False):
     n_word = len(thai2fit_model.index2word)
     n_char = len(char_to_index())
     # NOTE: for calculaation (mode, median, mean, sd) = (12, 36, 49.37, 42.50)
@@ -20,8 +20,7 @@ def train_model_controller(is_padding=False, debug=False, early_stop=False):
         ner: idx
         for idx, ner in enumerate(["padding"] + sorted(set(chain.from_iterable(dataset["train_target"]))))
     }
-    if is_padding:
-        dataset = padding_dataset(dataset, max_len_word, ner_label_index)
+    dataset = padding_dataset(dataset, max_len_word, ner_label_index)
 
     model = create_models(n_word, n_char, len(ner_label_index), max_len_word=max_len_word, debug=debug)
     history, model = fit_model(

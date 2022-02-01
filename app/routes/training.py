@@ -9,8 +9,7 @@ def training_group():
 
 
 @training_group.command()
-@click.option("--padding", is_flag=True)
 @click.option("--debug", is_flag=True)
 @click.option("--early_stop", is_flag=True)
-def train(padding, debug, early_stop):
-    train_model_controller(is_padding=padding, debug=debug, early_stop=early_stop)
+def train(debug, early_stop):
+    train_model_controller(debug=debug, early_stop=early_stop)
