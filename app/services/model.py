@@ -34,6 +34,14 @@ class CharacterEmbeddingBlock(Layer):
         **kwargs,
     ):
         super().__init__(name=name, **kwargs)
+        self._config = {
+            "n_chars": n_chars,
+            "max_len_char": max_len_char,
+            "character_embedding_dim": character_embedding_dim,
+            "character_LSTM_unit": character_LSTM_unit,
+            "lstm_recurrent_dropout": lstm_recurrent_dropout,
+            "name": name,
+        }
         self.embedding = TimeDistributed(
             Embedding(
                 input_dim=n_chars,
@@ -57,6 +65,9 @@ class CharacterEmbeddingBlock(Layer):
     def call(self, inputs):
         x = self.embedding(inputs)
         return self.encoding(x)
+
+    def get_config(self):
+        return self._config
 
 
 def create_models(
@@ -145,7 +156,7 @@ def fit_model(
         [X_word_tr, np.array(X_char_tr).reshape(-1, max_len, max_len_char)],
         y_tr,
         batch_size=train_batch_size,
-        epochs=10,
+        epochs=1,
         verbose=1,
         callbacks=callbacks_list,
         validation_data=([X_word_te, np.array(X_char_te).reshape(-1, max_len, max_len_char)], y_te),
