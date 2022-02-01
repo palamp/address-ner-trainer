@@ -30,6 +30,14 @@ def char_to_index() -> Dict[str, int]:
     return result
 
 
+@lru_cache
+def word_to_index() -> Dict[str, int]:
+    word_index = {word: index + 1 for index, word in enumerate(thai2fit_model.index2word)}
+    # reserved 0 value to `padding`
+    word_index["padding"] = 0
+    return word_index
+
+
 def encode_character_input(sentences, max_len_word, max_len_char):
     char2idx = char_to_index()
     x_char = []
@@ -92,7 +100,7 @@ def padding_dataset(
             value: Numpy array with shape `(len(sequences), maxlen)`
     """
 
-    thai2dict_word_index = {word: index for index, word in enumerate(thai2fit_model.index2word)}
+    word_index = word_to_index()
 
     def prepare_sequence_word(input_text):
         idxs = list()
