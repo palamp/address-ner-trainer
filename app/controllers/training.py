@@ -7,8 +7,10 @@ from ..services.model import create_models, fit_model, thai2fit_model
 def train_model_controller(is_padding=False, debug=False, early_stop=False):
     n_word = len(thai2fit_model.index2word)
     n_char = len(char_to_index())
-    max_len_word = 284
-    max_len_char = 30
+    # NOTE: for calculaation (mode, median, mean, sd) = (12, 36, 49.37, 42.50)
+    max_len_word = 140
+    # NOTE: for calculaation (mode, median, mean, sd) = (3, 3, 4.08, 2.91)
+    max_len_char = 10
 
     dataset = get_dataset("dataset/ner.data")
     x_char_dataset = encode_character_input(dataset["train_word"], max_len_word, max_len_char)
