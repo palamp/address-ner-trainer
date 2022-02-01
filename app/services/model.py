@@ -86,7 +86,7 @@ def create_models(
     # Word Input and Word Embedding Using Thai2Fit
     word_in = Input(shape=(max_len_word,), name="word_input")
     word_embeddings = Embedding(
-        input_dim=n_thai2dict,
+        input_dim=n_thai2dict + 1,
         output_dim=400,
         weights=[weights],
         input_length=max_len_word,
