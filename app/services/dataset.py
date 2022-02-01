@@ -15,7 +15,7 @@ from .model import thai2fit_model
 def char_to_index() -> Dict[str, int]:
     # fmt: off
     special_char = [
-        "pad", "unknown", " ", "$", "#", "!", "%", "&", "*", "+", ",", "-", ".", "/", ":", ";", "?",
+        "padding", "unknown", " ", "$", "#", "!", "%", "&", "*", "+", ",", "-", ".", "/", ":", ";", "?",
         "@", "^", "_", "`", "=", "|", "~", "'",'"', "(", ")", "{", "}", "<", ">", "[", "]", "\n"
     ]
     # fmt: on
@@ -42,7 +42,7 @@ def encode_character_input(sentences, max_len_word, max_len_char):
     char2idx = char_to_index()
     x_char = []
     for sentence in tqdm(sentences):
-        sent_seq = full((max_len_word, max_len_char), char2idx["pad"])
+        sent_seq = full((max_len_word, max_len_char), char2idx["padding"])
         word_loop = len(sentence) if len(sentence) < max_len_word else max_len_word
         for i in range(word_loop):
             char_loop = len(sentence[i][0]) if len(sentence[i][0]) < max_len_char else max_len_char
@@ -120,10 +120,10 @@ def padding_dataset(
         )
         return result
 
-    train_word = padding_sequence(dataset["train_word"], encode_word, word_index["pad"])
-    train_target = padding_sequence(dataset["train_target"], encode_target, ner_label_index["pad"])
-    test_word = padding_sequence(dataset["test_word"], encode_word, word_index["pad"])
-    test_target = padding_sequence(dataset["test_target"], encode_target, ner_label_index["pad"])
+    train_word = padding_sequence(dataset["train_word"], encode_word, word_index["padding"])
+    train_target = padding_sequence(dataset["train_target"], encode_target, ner_label_index["padding"])
+    test_word = padding_sequence(dataset["test_word"], encode_word, word_index["padding"])
+    test_target = padding_sequence(dataset["test_target"], encode_target, ner_label_index["padding"])
 
     return {
         "train_word": train_word,
