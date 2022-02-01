@@ -49,7 +49,7 @@ def encode_character_input(sentences, max_len_word, max_len_char):
             for j in range(char_loop):
                 sent_seq[i][j] = char2idx.get(sentence[i][j], char2idx["unknown"])
         x_char.append(sent_seq)
-    return x_char
+    return np.array(x_char).reshape(-1, max_len_word, max_len_char)
 
 
 def get_dataset(filepath) -> Dict[str, np.ndarray]:

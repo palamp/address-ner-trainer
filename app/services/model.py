@@ -125,8 +125,7 @@ def fit_model(
     X_char_te,
     y_te,
     train_batch_size=32,
-    max_len=284,
-    max_len_char=30,
+    epoch=100,
     is_early_stop=False,
 ):
     str_time = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -156,13 +155,13 @@ def fit_model(
         callbacks_list.append(early_stopper)
 
     history = model.fit(
-        [X_word_tr, np.array(X_char_tr).reshape(-1, max_len, max_len_char)],
+        [X_word_tr, X_char_tr],
         y_tr,
         batch_size=train_batch_size,
-        epochs=1,
+        epochs=epoch,
         verbose=1,
         callbacks=callbacks_list,
-        validation_data=([X_word_te, np.array(X_char_te).reshape(-1, max_len, max_len_char)], y_te),
+        validation_data=([X_word_te, X_char_te], y_te),
         shuffle=True,
     )
 
