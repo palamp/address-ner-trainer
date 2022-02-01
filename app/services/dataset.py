@@ -45,9 +45,9 @@ def encode_character_input(sentences, max_len_word, max_len_char):
         sent_seq = full((max_len_word, max_len_char), char2idx["padding"])
         word_loop = len(sentence) if len(sentence) < max_len_word else max_len_word
         for i in range(word_loop):
-            char_loop = len(sentence[i][0]) if len(sentence[i][0]) < max_len_char else max_len_char
+            char_loop = len(sentence[i]) if len(sentence[i]) < max_len_char else max_len_char
             for j in range(char_loop):
-                sent_seq[i][j] = char2idx.get(sentence[i][0][j], char2idx["unknown"])
+                sent_seq[i][j] = char2idx.get(sentence[i][j], char2idx["unknown"])
         x_char.append(sent_seq)
     return x_char
 
