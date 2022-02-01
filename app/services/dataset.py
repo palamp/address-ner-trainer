@@ -102,16 +102,11 @@ def padding_dataset(
 
     word_index = word_to_index()
 
-    def prepare_sequence_word(input_text):
-        idxs = list()
-        for word in input_text:
-            if word in thai2dict_word_index:
-                idxs.append(thai2dict_word_index[word])
-            else:
-                idxs.append(thai2dict_word_index["unknown"])  # Use UNK tag for unknown word
+    def encode_word(input_text):
+        idxs = [word_index.get(word, word_index["unknown"]) for word in input_text]
         return idxs
 
-    def prepare_sequence_target(input_label):
+    def encode_target(input_label):
         idxs = [ner_label_index[w] for w in input_label]
         return idxs
 
@@ -125,10 +120,10 @@ def padding_dataset(
         )
         return result
 
-    train_word = padding_sequence(dataset["train_word"], prepare_sequence_word, thai2dict_word_index["pad"])
-    train_target = padding_sequence(dataset["train_target"], prepare_sequence_target, ner_label_index["pad"])
-    test_word = padding_sequence(dataset["test_word"], prepare_sequence_word, thai2dict_word_index["pad"])
-    test_target = padding_sequence(dataset["test_target"], prepare_sequence_target, ner_label_index["pad"])
+    train_word = padding_sequence(dataset["train_word"], encode_word, word_index["pad"])
+    train_target = padding_sequence(dataset["train_target"], encode_target, ner_label_index["pad"])
+    test_word = padding_sequence(dataset["test_word"], encode_word, word_index["pad"])
+    test_target = padding_sequence(dataset["test_target"], encode_target, ner_label_index["pad"])
 
     return {
         "train_word": train_word,
