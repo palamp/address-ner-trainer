@@ -2,7 +2,7 @@ import dill
 from pytest import fixture
 from sklearn.model_selection import train_test_split
 
-from services.models.dataset import char_to_index, encode_character_input
+from app.services.dataset import char_to_index, encode_character_input
 
 
 def test_char_to_index():
