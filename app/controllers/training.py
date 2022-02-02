@@ -35,7 +35,6 @@ def train_model_controller(debug=False, early_stop=False):
         max_len_char=max_len_char,
         debug=debug,
     )
-    model.load_weights("saved_model/20220203-032022/weights-improvement-02-0.928.ckpt")
     history, model = fit_model(
         model,
         dataset["train_word"],
