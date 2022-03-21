@@ -18,7 +18,12 @@ def train_model_controller(debug=False, early_stop=False):
 
     ner_label_index = {
         ner: idx
-        for idx, ner in enumerate(["padding"] + sorted(set(chain.from_iterable(dataset["train_target"]))))
+        for idx, ner in enumerate(
+            ["padding"]
+            + sorted(
+                set(chain.from_iterable(dataset["train_target"])), key=lambda x: x[2:] if len(x) > 1 else x[0]
+            )
+        )
     }
     dataset = padding_dataset(dataset, max_len_word, ner_label_index)
 

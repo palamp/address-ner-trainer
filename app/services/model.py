@@ -1,9 +1,11 @@
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 import numpy as np
+import tensorflow as tf
 from gensim.models import KeyedVectors
-from tensorflow.keras import Model
+from tensorflow.keras import Model, metrics
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 from tensorflow.keras.layers import (
     LSTM,
@@ -16,8 +18,10 @@ from tensorflow.keras.layers import (
     TimeDistributed,
     concatenate,
 )
-from tensorflow.keras.metrics import Accuracy
+from tensorflow_addons.metrics import FBetaScore
 from tensorflow_addons.text.crf_wrapper import CRFModelWrapper
+from tensorflow_addons.utils.types import AcceptableDTypes, FloatTensorLike
+from typeguard import typechecked
 
 thai2fit_model: KeyedVectors = KeyedVectors.load_word2vec_format("thai2fit/thai2vecNoSym.bin", binary=True)
 
@@ -70,6 +74,31 @@ class CharacterEmbeddingBlock(Layer):
         return self._config
 
 
+class F1Score(FBetaScore):
+    @typechecked
+    def __init__(
+        self,
+        num_classes: FloatTensorLike,
+        average: str = None,
+        threshold: Optional[FloatTensorLike] = None,
+        name: str = "f1_score",
+        dtype: AcceptableDTypes = None,
+    ):
+        self.num_classes = num_classes
+        super().__init__(num_classes, average, 1.0, threshold, name=name, dtype=dtype)
+
+    def update_state(self, y_true: tf.Tensor, y_pred: tf.Tensor, sample_weight=None):
+        y_true = tf.one_hot(y_true, self.num_classes)
+        y_pred = tf.one_hot(y_pred, self.num_classes)
+        for idx in tf.range(tf.shape(y_true)[0]):
+            super(F1Score, self).update_state(y_true[idx], y_pred[idx], None)
+
+    def get_config(self):
+        base_config = super().get_config()
+        del base_config["beta"]
+        return base_config
+
+
 def create_models(
     n_thai2dict,
     n_chars,
@@ -112,7 +141,9 @@ def create_models(
     base_model = Model(inputs=[word_in, char_in], outputs=main_lstm)
 
     model = CRFModelWrapper(base_model, crf_unit)
-    model.compile(optimizer="adam", metrics=[Accuracy()], run_eagerly=debug)
+    model.compile(
+        optimizer="adam", metrics=[metrics.Accuracy(), F1Score(crf_unit, "weighted")], run_eagerly=debug,
+    )
     return model
 
 
@@ -129,19 +160,19 @@ def fit_model(
     is_early_stop=False,
 ):
     str_time = datetime.now().strftime("%Y%m%d-%H%M%S")
-    checkpoint_path = "saved_model/" + str_time + "/weights-improvement-{epoch:02d}-{accuracy:.3f}.ckpt"
-    tensorboard_logpath = "logs/" + str_time
+    checkpoint_path = "saved_model/" + str_time + "/weights-improvement-{epoch:02d}-{val_f1_score:.3f}.ckpt"
+    tensorboard_logpath = "saved_model/" + str_time + "/tensorboard"
     Path(checkpoint_path).parent.mkdir(parents=True, exist_ok=True)
     checkpoint = ModelCheckpoint(
         checkpoint_path,
-        monitor="val_accuracy",
+        monitor="val_f1_score",
         verbose=1,
         save_best_only=True,
         mode="max",
         save_weights_only=True,
     )
     early_stopper = EarlyStopping(
-        monitor="val_accuracy", min_delta=1e-3, patience=5, restore_best_weights=True, verbose=1
+        monitor="val_f1_score", min_delta=1e-5, patience=5, restore_best_weights=True, verbose=1, mode="max"
     )
     tensorboard = TensorBoard(
         log_dir=tensorboard_logpath,

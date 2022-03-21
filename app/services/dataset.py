@@ -49,7 +49,7 @@ def encode_character_input(sentences, max_len_word, max_len_char):
             for j in range(char_loop):
                 sent_seq[i][j] = char2idx.get(sentence[i][j], char2idx["unknown"])
         x_char.append(sent_seq)
-    return np.array(x_char).reshape(-1, max_len_word, max_len_char)
+    return np.array(x_char, dtype="int32").reshape(-1, max_len_word, max_len_char)
 
 
 def get_dataset(filepath) -> Dict[str, np.ndarray]:
@@ -126,8 +126,8 @@ def padding_dataset(
     test_target = padding_sequence(dataset["test_target"], encode_target, ner_label_index["padding"])
 
     return {
-        "train_word": train_word,
-        "train_target": train_target,
-        "test_word": test_word,
-        "test_target": test_target,
+        "train_word": train_word.astype("int32"),
+        "train_target": train_target.astype("int32"),
+        "test_word": test_word.astype("int32"),
+        "test_target": test_target.astype("int32"),
     }
