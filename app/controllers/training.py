@@ -45,6 +45,3 @@ def train_model_controller(debug=False, early_stop=False):
         dataset["test_target"],
         is_early_stop=early_stop,
     )
-
-    save_filepath = "saved_model/last_weight"
-    model.save(save_filepath)

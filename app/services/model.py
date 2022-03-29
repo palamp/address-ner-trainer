@@ -162,6 +162,7 @@ def fit_model(
     str_time = datetime.now().strftime("%Y%m%d-%H%M%S")
     checkpoint_path = "saved_model/" + str_time + "/weights-improvement-{epoch:02d}-{val_f1_score:.3f}.ckpt"
     tensorboard_logpath = "saved_model/" + str_time + "/tensorboard"
+    model_savepath = "saved_model/" + str_time + "/last_weight"
     Path(checkpoint_path).parent.mkdir(parents=True, exist_ok=True)
     checkpoint = ModelCheckpoint(
         checkpoint_path,
@@ -195,5 +196,6 @@ def fit_model(
         validation_data=([X_word_te, X_char_te], y_te),
         shuffle=True,
     )
+    model.save(model_savepath)
 
     return history, model
