@@ -155,15 +155,16 @@ def fit_model(
     X_word_te,
     X_char_te,
     y_te,
+    save_dir: Path,
     train_batch_size=32,
     epoch=100,
     is_early_stop=False,
 ):
-    str_time = datetime.now().strftime("%Y%m%d-%H%M%S")
-    checkpoint_path = "saved_model/" + str_time + "/weights-improvement-{epoch:02d}-{val_f1_score:.3f}.ckpt"
-    tensorboard_logpath = "saved_model/" + str_time + "/tensorboard"
-    model_savepath = "saved_model/" + str_time + "/last_weight"
-    Path(checkpoint_path).parent.mkdir(parents=True, exist_ok=True)
+    save_dir.mkdir(parents=True, exist_ok=True)
+    checkpoint_path = save_dir / "weights-improvement-{epoch:02d}-{val_loss:.3f}.ckpt"
+    tensorboard_logpath = save_dir / "tensorboard"
+    model_savepath = save_dir / "last_weight"
+
     checkpoint = ModelCheckpoint(
         checkpoint_path,
         monitor="val_f1_score",

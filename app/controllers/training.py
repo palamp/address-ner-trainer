@@ -1,6 +1,9 @@
+from datetime import datetime
 from itertools import chain
+from pathlib import Path
 
 from ..services.dataset import char_to_index, encode_character_input, get_dataset, padding_dataset
+from ..services.metrics import convert_model_prediction, ner_classification_report
 from ..services.model import create_models, fit_model, thai2fit_model
 
 
@@ -35,6 +38,7 @@ def train_model_controller(debug=False, early_stop=False):
         max_len_char=max_len_char,
         debug=debug,
     )
+    save_dir = Path("saved_model/{}".format(datetime.now().strftime("%Y%m%d-%H%M%S")))
     history, model = fit_model(
         model,
         dataset["train_word"],
@@ -43,5 +47,13 @@ def train_model_controller(debug=False, early_stop=False):
         dataset["test_word"],
         test_char,
         dataset["test_target"],
+        save_dir,
         is_early_stop=early_stop,
     )
+
+    pred_model = model.predict([dataset["test_word"], test_char], verbose=1)
+    report = ner_classification_report(
+        *convert_model_prediction(dataset["test_target"], pred_model, ner_label_index)
+    )
+    with open(save_dir / "classification_report.txt", "w") as f:
+        f.write(report)
