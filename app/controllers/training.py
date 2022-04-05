@@ -13,8 +13,8 @@ def train_model_controller(debug=False, early_stop=False):
     max_len_char = 10
 
     dataset = get_dataset("dataset/ner.data")
-    x_char_dataset = encode_character_input(dataset["train_word"], max_len_word, max_len_char)
-    y_char_dataset = encode_character_input(dataset["test_word"], max_len_word, max_len_char)
+    train_char = encode_character_input(dataset["train_word"], max_len_word, max_len_char)
+    test_char = encode_character_input(dataset["test_word"], max_len_word, max_len_char)
 
     ner_label_index = {
         ner: idx
@@ -38,10 +38,10 @@ def train_model_controller(debug=False, early_stop=False):
     history, model = fit_model(
         model,
         dataset["train_word"],
-        x_char_dataset,
+        train_char,
         dataset["train_target"],
         dataset["test_word"],
-        y_char_dataset,
+        test_char,
         dataset["test_target"],
         is_early_stop=early_stop,
     )
