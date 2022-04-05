@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import numpy as np
 from gensim.models import KeyedVectors
 from tensorflow.keras import Model, metrics
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
@@ -46,7 +47,7 @@ class CharacterEmbeddingBlock(Layer):
                 input_dim=n_chars,
                 output_dim=character_embedding_dim,
                 input_length=max_len_char,
-                mask_zero=True,
+                mask_zero=False,
             )
         )
 
@@ -89,7 +90,7 @@ def create_models(
         output_dim=400,
         weights=[weights],
         input_length=max_len_word,
-        mask_zero=True,
+        mask_zero=False,
         name="word_embedding",
         trainable=False,
     )(word_in)
@@ -112,7 +113,9 @@ def create_models(
 
     model = CRFModelWrapper(base_model, crf_unit)
     model.compile(
-        optimizer="adam", metrics=[metrics.Accuracy(), F1Score(crf_unit, "weighted")], run_eagerly=debug,
+        optimizer="adam",
+        metrics=[metrics.Accuracy(), F1Score(crf_unit, "weighted")],
+        run_eagerly=debug,
     )
     return model
 
