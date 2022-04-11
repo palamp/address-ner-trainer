@@ -12,3 +12,5 @@ loss_*.txt
 /thai2fit
 /logs
 /models
+
+app/statics/thai2vecNoSym.bin

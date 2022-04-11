@@ -19,7 +19,7 @@ from tensorflow_addons.text.crf_wrapper import CRFModelWrapper
 
 from .metrics import F1Score
 
-thai2fit_model: KeyedVectors = KeyedVectors.load_word2vec_format("thai2fit/thai2vecNoSym.bin", binary=True)
+thai2fit_model: KeyedVectors = KeyedVectors.load_word2vec_format("app/statics/thai2vecNoSym.bin", binary=True)
 
 
 class CharacterEmbeddingBlock(Layer):
@@ -134,20 +134,20 @@ def fit_model(
     is_early_stop=False,
 ):
     save_dir.mkdir(parents=True, exist_ok=True)
-    checkpoint_path = save_dir / "weights-improvement-{epoch:02d}-{val_loss:.3f}.ckpt"
+    checkpoint_path = save_dir / "weights-improvement-{epoch:02d}-{crf_loss:.3f}.ckpt"
     tensorboard_logpath = save_dir / "tensorboard"
     model_savepath = save_dir / "last_weight"
 
     checkpoint = ModelCheckpoint(
         checkpoint_path,
-        monitor="val_f1_score",
+        monitor="crf_loss",
         verbose=1,
         save_best_only=True,
         mode="max",
         save_weights_only=True,
     )
     early_stopper = EarlyStopping(
-        monitor="val_f1_score", min_delta=1e-5, patience=5, restore_best_weights=True, verbose=1, mode="max"
+        monitor="crf_loss", min_delta=1e-5, patience=5, restore_best_weights=True, verbose=1, mode="max"
     )
     tensorboard = TensorBoard(
         log_dir=tensorboard_logpath,

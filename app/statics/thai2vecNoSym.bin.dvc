@@ -1,0 +1,4 @@
+outs:
+- md5: 8eb9653731516218b11cce86465c8c3e
+  size: 90031098
+  path: thai2vecNoSym.bin
