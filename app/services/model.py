@@ -137,20 +137,20 @@ def fit_model(
     is_early_stop=False,
 ):
     save_dir.mkdir(parents=True, exist_ok=True)
-    checkpoint_path = save_dir / "weights-improvement-{epoch:02d}-{crf_loss:.3f}.ckpt"
+    checkpoint_path = save_dir / "weights-improvement-{epoch:02d}-{val_loss:.3f}.ckpt"
     tensorboard_logpath = save_dir / "tensorboard"
     model_savepath = save_dir / "last_weight"
 
     checkpoint = ModelCheckpoint(
         checkpoint_path,
-        monitor="crf_loss",
+        monitor="val_loss",
         verbose=1,
         save_best_only=True,
-        mode="max",
+        mode="min",
         save_weights_only=True,
     )
     early_stopper = EarlyStopping(
-        monitor="crf_loss", min_delta=1e-5, patience=5, restore_best_weights=True, verbose=1, mode="max"
+        monitor="val_loss", min_delta=1e-5, patience=5, restore_best_weights=True, verbose=1, mode="min"
     )
     tensorboard = TensorBoard(
         log_dir=tensorboard_logpath,
