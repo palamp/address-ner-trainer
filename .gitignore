@@ -9,7 +9,6 @@
 /saved_model
 loss_*.txt
 *.json
-/thai2fit
 /logs
 /models
 
