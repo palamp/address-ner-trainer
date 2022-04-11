@@ -114,7 +114,10 @@ def create_models(
     model = CRFModelWrapper(base_model, crf_unit)
     model.compile(
         optimizer="adam",
-        metrics=[metrics.Accuracy(), F1Score(crf_unit, "weighted")],
+        metrics=[
+            metrics.Accuracy(),
+            # F1Score(crf_unit, "weighted"),
+        ],
         run_eagerly=debug,
     )
     return model
