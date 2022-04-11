@@ -4,11 +4,11 @@ from pathlib import Path
 import dill
 from tqdm import tqdm
 
+from app.constants import name_prefixs
 from app.services.data_cleaning import (
     is_unique,
     normalize_quote,
     normalize_space,
-    prefixs,
     remove_emojis,
     remove_prefix,
     replace_and_remove_tags,
@@ -22,7 +22,7 @@ def alldata_list(lists):
         try:
             txt = text2conll2002(data, pos=False)
             data_all.append(list(map(tuple, txt)))
-            if any([prefix in data for prefix in prefixs]):
+            if any([prefix in data for prefix in name_prefixs]):
                 data = remove_prefix(data)
                 txt = text2conll2002(data, pos=False)
                 data_all.append(list(map(tuple, txt)))

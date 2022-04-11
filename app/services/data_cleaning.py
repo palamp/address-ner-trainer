@@ -1,13 +1,13 @@
 import re
 from typing import Dict
 
-emoji_pattern = re.compile(r"[\u0E00-\u0E7Fa-zA-Z0-9' \n\-!$%^&*()_+|~=`{}\[\]:'<>?,.#\/]")
+from ..constants import name_prefixs
 
-prefixs = ["นาย", "นาง", "น.ส.", "นางสาว", "น.พ.", "นพ.", "พ.ต.ท.", "ด.ช.", "ด.ญ.", "เด็กชาย", "เด็กหญิง"]
+emoji_pattern = re.compile(r"[\u0E00-\u0E7Fa-zA-Z0-9' \n\-!$%^&*()_+|~=`{}\[\]:'<>?,.#\/]")
 
 
 def remove_prefix(text):
-    for i in prefixs:
+    for i in name_prefixs:
         text = text.replace(i, "")
     return text
 
