@@ -67,6 +67,8 @@ def train_model_controller(debug=False, early_stop=False):
         pkdump(char_to_index(), f, protocol=4)
     with open(static_dir / "word_index.pickle", "wb") as f:
         pkdump(word_to_index(), f, protocol=4)
+    with open(static_dir / "max_len_word_char.pickle", "wb") as f:
+        pkdump((max_len_word, max_len_char), f, protocol=4)
 
     pred_model = model.predict([dataset["test_word"], test_char], verbose=1)
     report = ner_classification_report(
