@@ -1,8 +1,15 @@
 from datetime import datetime
 from itertools import chain
 from pathlib import Path
+from pickle import dump as pkdump
 
-from ..services.dataset import char_to_index, encode_character_input, get_dataset, padding_dataset
+from ..services.dataset import (
+    char_to_index,
+    encode_character_input,
+    get_dataset,
+    padding_dataset,
+    word_to_index,
+)
 from ..services.metrics import convert_model_prediction, ner_classification_report
 from ..services.model import create_models, fit_model, thai2fit_model
 
@@ -51,6 +58,15 @@ def train_model_controller(debug=False, early_stop=False):
         save_dir,
         is_early_stop=early_stop,
     )
+
+    static_dir = save_dir / "statics"
+    static_dir.mkdir(parents=True, exist_ok=True)
+    with open(static_dir / "ner_label_index.pickle", "wb") as f:
+        pkdump(ner_label_index, f, protocol=4)
+    with open(static_dir / "char_index.pickle", "wb") as f:
+        pkdump(char_to_index(), f, protocol=4)
+    with open(static_dir / "word_index.pickle", "wb") as f:
+        pkdump(word_to_index(), f, protocol=4)
 
     pred_model = model.predict([dataset["test_word"], test_char], verbose=1)
     report = ner_classification_report(
