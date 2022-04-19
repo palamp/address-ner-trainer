@@ -39,6 +39,7 @@ def train_model_controller(debug=False, early_stop=False):
         debug=debug,
     )
     save_dir = Path("saved_model/{}".format(datetime.now().strftime("%Y%m%d-%H%M%S")))
+    save_dir.mkdir(parents=True, exist_ok=True)
     history, model = fit_model(
         model,
         dataset["train_word"],

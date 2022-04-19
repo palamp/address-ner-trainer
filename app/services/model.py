@@ -136,7 +136,6 @@ def fit_model(
     epoch=100,
     is_early_stop=False,
 ):
-    save_dir.mkdir(parents=True, exist_ok=True)
     checkpoint_path = save_dir / "weights-improvement-{epoch:02d}-{val_loss:.3f}.ckpt"
     tensorboard_logpath = save_dir / "tensorboard"
     model_savepath = save_dir / "last_weight"
