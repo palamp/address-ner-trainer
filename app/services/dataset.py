@@ -86,7 +86,7 @@ def get_dataset(filepath) -> Dict[str, np.ndarray]:
 
 
 def padding_dataset(
-    dataset: Dict[str, np.ndarray], max_len: int, ner_label_index: Dict[str, int]
+    dataset: Dict[str, np.ndarray], max_len: int, ner_label_index: Dict[str, int], word_index: Dict[str, int] = word_to_index()
 ) -> Dict[str, np.ndarray]:
     """
     Args:
@@ -98,8 +98,6 @@ def padding_dataset(
             key: String
             value: Numpy array with shape `(len(sequences), maxlen)`
     """
-
-    word_index = word_to_index()
 
     def encode_word(input_text):
         idxs = [word_index.get(word, word_index["unknown"]) for word in input_text]
