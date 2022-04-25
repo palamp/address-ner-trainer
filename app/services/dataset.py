@@ -38,16 +38,15 @@ def word_to_index() -> Dict[str, int]:
     return word_index
 
 
-def encode_character_input(sentences, max_len_word, max_len_char):
-    char2idx = char_to_index()
+def encode_character_input(sentences, max_len_word, max_len_char, char_index = char_to_index()):
     x_char = []
     for sentence in tqdm(sentences):
-        sent_seq = full((max_len_word, max_len_char), char2idx["padding"])
+        sent_seq = full((max_len_word, max_len_char), char_index["padding"])
         word_loop = len(sentence) if len(sentence) < max_len_word else max_len_word
         for i in range(word_loop):
             char_loop = len(sentence[i]) if len(sentence[i]) < max_len_char else max_len_char
             for j in range(char_loop):
-                sent_seq[i][j] = char2idx.get(sentence[i][j], char2idx["unknown"])
+                sent_seq[i][j] = char_index.get(sentence[i][j], char_index["unknown"])
         x_char.append(sent_seq)
     return np.array(x_char, dtype="int32").reshape(-1, max_len_word, max_len_char)
 
