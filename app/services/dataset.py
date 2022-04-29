@@ -38,7 +38,7 @@ def word_to_index() -> Dict[str, int]:
     return word_index
 
 
-def encode_character_input(sentences, max_len_word, max_len_char, char_index = char_to_index()):
+def encode_character_input(sentences, max_len_word, max_len_char, char_index=char_to_index()):
     x_char = []
     for sentence in tqdm(sentences):
         sent_seq = full((max_len_word, max_len_char), char_index["padding"])
@@ -86,7 +86,10 @@ def get_dataset(filepath) -> Dict[str, np.ndarray]:
 
 
 def padding_dataset(
-    dataset: Dict[str, np.ndarray], max_len: int, ner_label_index: Dict[str, int], word_index: Dict[str, int] = word_to_index()
+    dataset: Dict[str, np.ndarray],
+    max_len: int,
+    ner_label_index: Dict[str, int],
+    word_index: Dict[str, int] = word_to_index(),
 ) -> Dict[str, np.ndarray]:
     """
     Args:
